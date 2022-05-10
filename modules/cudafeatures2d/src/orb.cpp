@@ -675,6 +675,8 @@ namespace
 
             Size sz(cvRound(image.cols * scale), cvRound(image.rows * scale));
 
+            maskPyr_[level].allocator = image.allocator;
+            imagePyr_[level].allocator = image.allocator;
             ensureSizeIsEnough(sz, image.type(), imagePyr_[level]);
             ensureSizeIsEnough(sz, CV_8UC1, maskPyr_[level]);
             maskPyr_[level].setTo(Scalar::all(255));
