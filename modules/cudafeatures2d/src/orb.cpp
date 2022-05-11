@@ -669,14 +669,16 @@ namespace
         imagePyr_.resize(nLevels_);
         maskPyr_.resize(nLevels_);
 
+        BufferPool pool(stream);
+
         for (int level = 0; level < nLevels_; ++level)
         {
             float scale = 1.0f / getScale(scaleFactor_, firstLevel_, level);
 
             Size sz(cvRound(image.cols * scale), cvRound(image.rows * scale));
 
-            maskPyr_[level].allocator = image.allocator;
-            imagePyr_[level].allocator = image.allocator;
+            maskPyr_[level].allocator = pool.getAllocator();
+            imagePyr_[level].allocator = pool.getAllocator();
             ensureSizeIsEnough(sz, image.type(), imagePyr_[level]);
             ensureSizeIsEnough(sz, CV_8UC1, maskPyr_[level]);
             maskPyr_[level].setTo(Scalar::all(255));
@@ -800,7 +802,6 @@ namespace
 
         ensureSizeIsEnough(nAllkeypoints, descriptorSize(), CV_8UC1, _descriptors);
         GpuMat descriptors = _descriptors.getGpuMat();
-
         int offset = 0;
 
         for (int level = 0; level < nLevels_; ++level)

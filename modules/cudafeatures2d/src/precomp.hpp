@@ -46,7 +46,7 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
-
+#include "iostream"
 #include "opencv2/cudafeatures2d.hpp"
 #include "opencv2/cudaarithm.hpp"
 #include "opencv2/cudawarping.hpp"
