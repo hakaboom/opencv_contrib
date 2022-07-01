@@ -48,9 +48,13 @@ using namespace cv::cuda;
 #if !defined (HAVE_CUDA) || defined (CUDA_DISABLER)
 
 void cv::cuda::add(InputArray, InputArray, OutputArray, InputArray, int, Stream&) { throw_no_cuda(); }
+void cv::cuda::add(InputArray, double, OutputArray, InputArray, int, Stream&) { throw_no_cuda(); }
 void cv::cuda::subtract(InputArray, InputArray, OutputArray, InputArray, int, Stream&) { throw_no_cuda(); }
+void cv::cuda::subtract(InputArray, double, OutputArray, InputArray, int, Stream&) { throw_no_cuda(); }
 void cv::cuda::multiply(InputArray, InputArray, OutputArray, double, int, Stream&) { throw_no_cuda(); }
+void cv::cuda::multiply(InputArray, double, OutputArray, double, int, Stream&) { throw_no_cuda(); }
 void cv::cuda::divide(InputArray, InputArray, OutputArray, double, int, Stream&) { throw_no_cuda(); }
+void cv::cuda::divide(InputArray, double, OutputArray, double, int, Stream&) { throw_no_cuda(); }
 void cv::cuda::absdiff(InputArray, InputArray, OutputArray, Stream&) { throw_no_cuda(); }
 
 void cv::cuda::abs(InputArray, OutputArray, Stream&) { throw_no_cuda(); }
@@ -174,6 +178,10 @@ void cv::cuda::add(InputArray src1, InputArray src2, OutputArray dst, InputArray
     arithm_op(src1, src2, dst, mask, 1.0, dtype, stream, addMat, addScalar);
 }
 
+void cv::cuda::add(InputArray src1, double src2, OutputArray dst, InputArray mask, int dtype, Stream& stream)
+{
+    arithm_op(src1, InputArray(src2), dst, mask, 1.0, dtype, stream, addMat, addScalar);
+}
 ////////////////////////////////////////////////////////////////////////
 // subtract
 
@@ -186,6 +194,10 @@ void cv::cuda::subtract(InputArray src1, InputArray src2, OutputArray dst, Input
     arithm_op(src1, src2, dst, mask, 1.0, dtype, stream, subMat, subScalar);
 }
 
+void cv::cuda::subtract(InputArray src1, double src2, OutputArray dst, InputArray mask, int dtype, Stream& stream)
+{
+    arithm_op(src1, InputArray(src2), dst, mask, 1.0, dtype, stream, subMat, subScalar);
+}
 ////////////////////////////////////////////////////////////////////////
 // multiply
 
@@ -229,6 +241,40 @@ void cv::cuda::multiply(InputArray _src1, InputArray _src2, OutputArray _dst, do
     }
 }
 
+void cv::cuda::multiply(InputArray _src1, double _src2, OutputArray _dst, double scale, int dtype, Stream& stream)
+{
+    InputArray __src2 = InputArray(_src2);
+    if (_src1.type() == CV_8UC4 && __src2.type() == CV_32FC1)
+    {
+        GpuMat src1 = getInputMat(_src1, stream);
+        GpuMat src2 = getInputMat(__src2, stream);
+
+        CV_Assert( src1.size() == src2.size() );
+
+        GpuMat dst = getOutputMat(_dst, src1.size(), src1.type(), stream);
+
+        mulMat_8uc4_32f(src1, src2, dst, stream);
+
+        syncOutput(dst, _dst, stream);
+    }
+    else if (_src1.type() == CV_16SC4 && __src2.type() == CV_32FC1)
+    {
+        GpuMat src1 = getInputMat(_src1, stream);
+        GpuMat src2 = getInputMat(__src2, stream);
+
+        CV_Assert( src1.size() == src2.size() );
+
+        GpuMat dst = getOutputMat(_dst, src1.size(), src1.type(), stream);
+
+        mulMat_16sc4_32f(src1, src2, dst, stream);
+
+        syncOutput(dst, _dst, stream);
+    }
+    else
+    {
+        arithm_op(_src1, __src2, _dst, GpuMat(), scale, dtype, stream, mulMat, mulScalar);
+    }
+}
 ////////////////////////////////////////////////////////////////////////
 // divide
 
@@ -272,6 +318,40 @@ void cv::cuda::divide(InputArray _src1, InputArray _src2, OutputArray _dst, doub
     }
 }
 
+void cv::cuda::divide(InputArray _src1, double _src2, OutputArray _dst, double scale, int dtype, Stream& stream)
+{
+    InputArray __src2 = InputArray(_src2);
+    if (_src1.type() == CV_8UC4 && __src2.type() == CV_32FC1)
+    {
+        GpuMat src1 = getInputMat(_src1, stream);
+        GpuMat src2 = getInputMat(__src2, stream);
+
+        CV_Assert( src1.size() == src2.size() );
+
+        GpuMat dst = getOutputMat(_dst, src1.size(), src1.type(), stream);
+
+        divMat_8uc4_32f(src1, src2, dst, stream);
+
+        syncOutput(dst, _dst, stream);
+    }
+    else if (_src1.type() == CV_16SC4 && __src2.type() == CV_32FC1)
+    {
+        GpuMat src1 = getInputMat(_src1, stream);
+        GpuMat src2 = getInputMat(__src2, stream);
+
+        CV_Assert( src1.size() == src2.size() );
+
+        GpuMat dst = getOutputMat(_dst, src1.size(), src1.type(), stream);
+
+        divMat_16sc4_32f(src1, src2, dst, stream);
+
+        syncOutput(dst, _dst, stream);
+    }
+    else
+    {
+        arithm_op(_src1, __src2, _dst, GpuMat(), scale, dtype, stream, divMat, divScalar);
+    }
+}
 //////////////////////////////////////////////////////////////////////////////
 // absdiff
 

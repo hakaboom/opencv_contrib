@@ -84,6 +84,7 @@ destination array to be changed. The mask can be used only with single channel i
 @sa add
  */
 CV_EXPORTS_W void add(InputArray src1, InputArray src2, OutputArray dst, InputArray mask = noArray(), int dtype = -1, Stream& stream = Stream::Null());
+CV_EXPORTS_W void add(InputArray src1, double src2, OutputArray dst, InputArray mask = noArray(), int dtype = -1, Stream& stream = Stream::Null());
 
 /** @brief Computes a matrix-matrix or matrix-scalar difference.
 
@@ -99,6 +100,7 @@ destination array to be changed. The mask can be used only with single channel i
 @sa subtract
  */
 CV_EXPORTS_W void subtract(InputArray src1, InputArray src2, OutputArray dst, InputArray mask = noArray(), int dtype = -1, Stream& stream = Stream::Null());
+CV_EXPORTS_W void subtract(InputArray src1, double src2, OutputArray dst, InputArray mask = noArray(), int dtype = -1, Stream& stream = Stream::Null());
 
 /** @brief Computes a matrix-matrix or matrix-scalar per-element product.
 
@@ -113,6 +115,7 @@ The depth is defined by dtype or src1 depth.
 @sa multiply
  */
 CV_EXPORTS_W void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale = 1, int dtype = -1, Stream& stream = Stream::Null());
+CV_EXPORTS_W void multiply(InputArray src1, double src2, OutputArray dst, double scale = 1, int dtype = -1, Stream& stream = Stream::Null());
 
 /** @brief Computes a matrix-matrix or matrix-scalar division.
 
@@ -129,6 +132,7 @@ This function, in contrast to divide, uses a round-down rounding mode.
 @sa divide
  */
 CV_EXPORTS_W void divide(InputArray src1, InputArray src2, OutputArray dst, double scale = 1, int dtype = -1, Stream& stream = Stream::Null());
+CV_EXPORTS_W void divide(InputArray src1, double src2, OutputArray dst, double scale = 1, int dtype = -1, Stream& stream = Stream::Null());
 
 /** @brief Computes per-element absolute difference of two matrices (or of a matrix and scalar).
 
